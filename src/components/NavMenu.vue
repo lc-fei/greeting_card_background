@@ -1,7 +1,7 @@
 <template>
   <el-row class="tac">
     <el-col :span="6">
-      <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
+      <el-menu default-active="1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
         <!-- <el-menu-item index="1">
           <template slot="title">
             <i class="el-icon-coin"></i>
@@ -32,7 +32,11 @@
         </el-menu-item>
       </el-menu>
     </el-col>
+
+    <!-- 组件1 -->
     <Mybody :dataList="retList" @itemDeleted="refreshData"></Mybody>
+    <!-- 组件1 -->
+
     <div class="alert" @click="backHide">
       <div class=" alert-body">
         <div class="alert-title">添加贺卡<div class="close" @click="hide()">x</div>
@@ -43,11 +47,12 @@
             <!-- 贺卡名字 -->
             <div class="mybox">
               <span class="myborder">输入图片名字</span><br>
-              <input type="text" name="name">
+              <input type="text" name="imageName">
             </div>
             <!-- 图片分类 -->
             <div class="mybox">
               <span class="myborder">选择图片分类:</span><br>
+              <span><label><input name="type" type="checkbox" value="carousel" />轮播图&nbsp;&nbsp;</label></span>
               <span><label><input name="type" type="checkbox" value="festival" />节日&nbsp;&nbsp;</label></span>
               <span><label><input name="type" type="checkbox" value="couple" />情侣&nbsp;&nbsp;</label></span>
               <span><label><input name="type" type="checkbox" value="birthday" />生日&nbsp;&nbsp;</label></span>
@@ -105,7 +110,7 @@
           alert.style.display = 'none'
         }
       },
-      submit(e) {
+      async submit(e) {
         e.preventDefault()
         // console.log(e)
         const form = e.target
@@ -117,7 +122,7 @@
           .filter(arr => arr.checked)
           .map(arr => arr.value)
         formData.append('types', JSON.stringify(isDay))
-        axios({
+        await axios({
           url: 'http://8.137.98.54:8080/UploadImage',
           method: 'POST',
           data: formData,
@@ -135,14 +140,14 @@
 
 
       //发类型，接受贺卡数组
-      bigNav(e) {
+      async bigNav(e) {
         this.type = e.target.dataset.mtype
         console.log(JSON.stringify(
           {
             type: this.type
           }
         ))
-        axios({
+        await axios({
           url: 'http://8.137.98.54:8080/getMessage',
           method: 'POST',
           data: JSON.stringify({
@@ -182,12 +187,12 @@
     components: {
       Mybody
     },
-    created() {
-      axios({
+    async created() {
+      await axios({
         url: 'http://8.137.98.54:8080/getMessage',
         method: 'POST',
         data: JSON.stringify({
-          type: 'festival'
+          type: 'all'
         }),
         headers: {
           'Content-Type': 'application/json' // 指定请求头为JSON类型

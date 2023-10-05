@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="dataList" height="500" border style="width: 70%">
+  <el-table :data="dataList" height="600" border style="width: 70%">
     <el-table-column label="序号" type="index" width="100">
     </el-table-column>
     <el-table-column prop="imageName" label="名称" width="240">
@@ -45,15 +45,14 @@
 
       //删除数据方法
       handleDelete(index, row) {
-        const formData = new FormData()
         console.log(row)
-        const id = row.imageId
-        formData.append('imageId', parseInt(id, 10))
-        console.log(formData.get('imageId'))
+        const imageId = row.imageId
         axios({
           url: 'http://8.137.98.54:8080/delMessage',
           method: 'POST',
-          data: formData
+          data: {
+            imageId
+          }
         }).then(ret => {
           console.log(ret)
           alert('删除成功')
