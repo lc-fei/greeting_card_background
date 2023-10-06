@@ -47,11 +47,16 @@
       handleDelete(index, row) {
         console.log(row)
         const imageId = row.imageId
+        console.log(imageId)
+        console.log(this.token)
         axios({
-          url: 'http://8.137.98.54:8080/delMessage',
+          url: 'http://8.137.98.54:8080/admin/delMessage',
           method: 'POST',
           data: {
             imageId
+          },
+          headers: {
+            token: this.token
           }
         }).then(ret => {
           console.log(ret)
@@ -64,6 +69,11 @@
       }
 
     },
+    computed: {
+      token() {
+        return this.$store.state.token
+      }
+    }
   }
 </script>
 

@@ -75,6 +75,7 @@
           </div>
           <div class="sub-father">
             <button type="submit" class="submit">上传</button>
+            <input type="reset" class="reset">
           </div>
         </form>
       </div>
@@ -123,16 +124,20 @@
           .map(arr => arr.value)
         formData.append('types', JSON.stringify(isDay))
         await axios({
-          url: 'http://8.137.98.54:8080/UploadImage',
+          url: 'http://8.137.98.54:8080/admin/upLoadImage',
           method: 'POST',
           data: formData,
+          headers: {
+            token: this.token
+          }
         }).then(ret => {
           console.log(ret)
-
           alert('上传成功')
+          document.querySelector('.reset').click()    //触发reset的点击事件，重置表单
         }).catch(err => {
           alert('增加贺卡失败了')
           console.log(err)
+          document.querySelector('.reset').click()
         })
         document.querySelector('.alert').style.display = 'none'
       },
@@ -148,13 +153,14 @@
           }
         ))
         await axios({
-          url: 'http://8.137.98.54:8080/getMessage',
+          url: 'http://8.137.98.54:8080/admin/getMessage',
           method: 'POST',
           data: JSON.stringify({
             type: this.type
           }),
           headers: {
-            'Content-Type': 'application/json' // 指定请求头为JSON类型
+            'Content-Type': 'application/json', // 指定请求头为JSON类型
+            token: this.token
           }
         }).then(ret => {
           this.retList = ret.data.data
@@ -164,42 +170,34 @@
           alert('获取信息出错')
         })
       },
-      refreshData() {
-        axios({
-          url: 'http://8.137.98.54:8080/getMessage',
-          method: 'POST',
-          data: JSON.stringify({
-            type: this.type
-          }),
-          headers: {
-            'Content-Type': 'application/json' // 指定请求头为JSON类型
-          }
-        }).then(ret => {
-          this.retList = ret.data.data
-          // console.log(this.retList)
-        }).catch(err => {
-          console.log(err)
-          alert('获取信息出错')
-        })
-      }
-
     },
     components: {
       Mybody
     },
+    computed: {
+      token() {
+        return this.$store.state.token
+      }
+    },
+
+    //created
     async created() {
       await axios({
-        url: 'http://8.137.98.54:8080/getMessage',
+        url: 'http://8.137.98.54:8080/admin/getMessage',
         method: 'POST',
         data: JSON.stringify({
           type: 'all'
         }),
         headers: {
-          'Content-Type': 'application/json' // 指定请求头为JSON类型
+          'Content-Type': 'application/json', // 指定请求头为JSON类型
+          'Authorization': this.token
         }
       }).then(ret => {
         this.retList = ret.data.data
         console.log(this.retList)
+      }).catch(err => {
+        console.log(err)
+        alert('获取信息出错')
       })
     }
   }
@@ -297,5 +295,8 @@
   }
   input {
     outline: none !important;
+  }
+  .reset {
+    display: none;
   }
 </style>
