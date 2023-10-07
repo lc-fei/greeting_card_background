@@ -109,13 +109,15 @@
       },
 
 
-      //增加贺卡
       backHide(e) {     //这里注意，传参要不是 backHide($event),要不就不写括号，直接是backHide
         const alert = document.querySelector('.alert')
         if (e.target == alert) {
           alert.style.display = 'none'
         }
       },
+
+      //增加贺卡
+
       async submit(e) {
         e.preventDefault()
         // console.log(e)
@@ -151,30 +153,63 @@
 
 
       //发类型，接受贺卡数组
+      //响应拦截
+      typeHandleResponce(responce) {
+        if (responce.data.code === 0) {
+          throw new Error(responce.data.msg || '获取信息失败')
+        }
+        return responce.data.data
+      },
       async bigNav(e) {
-        this.type = e.target.dataset.mtype
-        console.log(JSON.stringify(
-          {
-            type: this.type
+        try {
+          this.type = e.target.dataset.mtype
+          console.log(JSON.stringify(
+            {
+              type: this.type
+            }
+          ))
+          const ret = await axios({
+            url: 'http://localhost:8080/admin/getMessage',
+            method: 'POST',
+            data: JSON.stringify({
+              type: this.type
+            }),
+            headers: {
+              'Content-Type': 'application/json', // 指定请求头为JSON类型
+              "token": this.token,
+            }
+          })
+          //把ret给响应拦截，然后直接赋值给retList
+          //ret也确实是对象数组
+          this.retList = this.typeHandleResponce(ret)
+        } catch (err) {
+          console.log(err.message)
+
+          //如果token失效的话，特殊处理
+          if (err.message === 'NOT_LOGIN') {
+            //弹窗
+            alert('登录信息过期，请重新登录')
+            //清除token信息
+            this.$store.commit('addtoken', '')
+            localStorage.setItem('token', '')
+            //跳转回login
+            this.$router.push({ name: 'login' })
           }
-        ))
-        await axios({
-          url: 'http://localhost:8080/admin/getMessage',
-          method: 'POST',
-          data: JSON.stringify({
-            type: this.type
-          }),
-          headers: {
-            'Content-Type': 'application/json', // 指定请求头为JSON类型
-            "token": this.token,
+          else {
+            alert(err.message)
           }
-        }).then(ret => {
-          this.retList = ret.data.data
-          console.log(this.retList)
-        }).catch(err => {
-          console.log(err)
-          alert('获取信息出错')
-        })
+
+        }
+
+
+
+        // .then(ret => {
+        //   this.retList = ret.data.data
+        //   console.log(this.retList)
+        // }).catch(err => {
+        //   console.log(err)
+        //   alert('获取信息出错')
+        // })
       },
     },
     components: {
@@ -186,25 +221,47 @@
       }
     },
 
-    async created() {
-      await axios({
-        url: 'http://localhost:8080/admin/getMessage',
-        method: 'POST',
-        data: JSON.stringify({
-          type: 'all'
-        }),
-        headers: {
-          'Content-Type': 'application/json', // 指定请求头为JSON类型
-          'token': this.token
-        }
 
-      }).then(ret => {
-        this.retList = ret.data.data
-        console.log(this.retList)
-      }).catch(err => {
-        console.log(err)
-        alert('获取信息出错')
-      })
+    //刚进入初始化数据
+    //有问题 刷新后回失去localstorage的token
+    async mounted() {
+      try {
+        //先从localstorage获取token
+        await setTimeout(() => {
+        }, 2000);
+        this.token = await localStorage.getItem('token')
+        console.log('从这开始')
+        console.log(this.token)
+        console.log('从这结束')
+        const ret = await axios({
+          url: 'http://localhost:8080/admin/getMessage',
+          method: 'POST',
+          data: JSON.stringify({
+            type: 'all'
+          }),
+          headers: {
+            'Content-Type': 'application/json', // 指定请求头为JSON类型
+            'token': this.token
+          }
+        })
+        this.retList = this.typeHandleResponce(ret)
+      } catch (err) {
+        console.log(err.message)
+
+        //如果token失效的话，特殊处理
+        if (err.message === 'NOT_LOGIN') {
+          //弹窗
+          alert('登录信息过期，请重新登录')
+          //清除token信息
+          this.$store.commit('addtoken', '')
+          localStorage.setItem('token', '')
+          //跳转回login
+          this.$router.push({ name: 'login' })
+        }
+        else {
+          alert(err.message)
+        }
+      }
     }
   }
 </script>

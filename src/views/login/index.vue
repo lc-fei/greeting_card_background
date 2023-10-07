@@ -6,11 +6,11 @@
         <h1 class="font">LogIn</h1>
         <div class="username mydiv">
           <span class="sp">用户名：</span>
-          <input type="text" v-model="userName" class="inp" placeholder=" 请输入用户名">
+          <input type="text" v-model="userName" class="inp" placeholder=" 请输入用户名" @keydown.enter="enterChange">
         </div>
         <div class="password mydiv">
           <span class="sp">密&nbsp;&nbsp;&nbsp;码：</span>
-          <input type="password" v-model="password" class="inp" placeholder=" 请输入密码">
+          <input type="password" v-model="password" class="inp change" placeholder=" 请输入密码" @keydown.enter="enterLogin">
         </div>
         <button class="submit" @mousedown="keycolor=true" @mouseup="keycolor=false" :class="{'keycolor': keycolor}" @click="submit">登录</button>
       </div>
@@ -29,35 +29,67 @@
       }
     },
     methods: {
+
+      //请求拦截器
+      async sendRequest(config) {
+        if (JSON.parse(config.data).userName.length != '12') {
+          // throw new Error(response.message || '请求出错');
+          throw new Error('账号格式错误，请重新输入')
+        }
+        const responce = await axios(config)       //发送请求的时候，因为数据不是直接加到axios中的，所以要转成JSON以及加请求头
+        return responce
+      },
+
+      //响应拦截器
+      handleResponse(responce) {
+        // console.log('ret:')
+        // console.log(ret)
+        // console.log(typeof ret)    //对象
+        if (responce.data.code === 0) {
+          throw new Error(responce.data.msg || '登录出错')
+        }
+        console.log('我要返回token了')
+        const token = responce.data.data
+        return token          //返回token
+      },
+
+
       async submit() {
         // console.log(this.$store.state.sign)
         // console.log(this.password)
-        await axios({
-          url: 'http://localhost:8080/admin/login',
-          method: 'POST',
-          data: {
-            userName: this.userName,
-            password: this.password
-          }
-        }).then(ret => {
-          // if (this.$store.state.token) {
-          //   alert('您已登录，不需再次登录')
-          //   this.$router.push({ name: 'data' })
-          //   return
-          // }
-          const token = ret.data.data
-          localStorage.setItem('token', token)
-          this.$store.commit('addtoken', token)
-          console.log('token:' + this.$store.state.token)
-          console.log(token)
+        try {
+          const ret = await this.sendRequest({       //这里直接await解析promise对象
+            url: 'http://localhost:8080/admin/login',
+            method: 'POST',
+            data: JSON.stringify({
+              userName: this.userName,
+              password: this.password
+            }),
+            headers: {
+              'Content-Type': 'application/json'         //别忘了
+            }
+          })
+          let retToken = this.handleResponse(ret)
+          console.log(retToken)
+          localStorage.setItem('token', retToken)
+          this.$store.commit('addtoken', retToken)
+
+          //跳转
           this.$router.push({ name: 'data' })
           alert('登录成功')
-        }).catch(err => {
-          console.log(err)
-          alert('登录失败')
-        })
+        }
+        catch (err) {
+          console.log(err.message)
+          alert(err.message)
+        }
       },
-    }
+      enterLogin() {
+        document.querySelector('.submit').click()
+      },
+      enterChange() {
+        document.querySelector('.change').focus()
+      }
+    },
   }
 </script>
 
