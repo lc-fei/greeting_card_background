@@ -1,0 +1,19 @@
+<template>
+  <div id="app">
+    <router-link to="/data">data</router-link>
+    <br><router-link to="/login">login</router-link>
+    <router-view></router-view>
+  </div>
+</template>
+
+<script>
+  // import MyBody from './components/body.vue';
+
+  export default {
+    name: 'App',
+
+  }
+</script>
+
+<style lang="less" scoped>
+</style>
