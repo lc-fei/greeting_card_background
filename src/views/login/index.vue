@@ -47,6 +47,9 @@
           // }
           const token = ret.data.data
           localStorage.setItem('token', token)
+          this.$store.commit('addtoken', token)
+          console.log('token:' + this.$store.state.token)
+          console.log(token)
           this.$router.push({ name: 'data' })
           alert('登录成功')
         }).catch(err => {

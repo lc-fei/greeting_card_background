@@ -159,7 +159,7 @@
           }
         ))
         await axios({
-          url: '/admin/getMessage',
+          url: 'http://localhost:8080/admin/getMessage',
           method: 'POST',
           data: JSON.stringify({
             type: this.type
