@@ -50,7 +50,7 @@
         console.log(imageId)
         console.log(this.token)
         axios({
-          url: 'http://8.137.98.54:8080/admin/delMessage',
+          url: 'http://localhost:8080/admin/delMessage',
           method: 'POST',
           data: {
             imageId

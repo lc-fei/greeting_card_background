@@ -129,7 +129,7 @@
           .map(arr => arr.value)
         formData.append('types', JSON.stringify(isDay))
         await axios({
-          url: 'http://8.137.98.54:8080/admin/upLoadImage',
+          url: 'http://localhost:8080/admin/upLoadImage',
           method: 'POST',
           data: formData,
           headers: {
@@ -188,7 +188,7 @@
 
     async created() {
       await axios({
-        url: 'http://8.137.98.54:8080/admin/getMessage',
+        url: 'http://localhost:8080/admin/getMessage',
         method: 'POST',
         data: JSON.stringify({
           type: 'all'
