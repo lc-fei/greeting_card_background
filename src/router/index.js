@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter  from "vue-router";
 import data from "@/views/data/index.vue"
 import login from "@/views/login/index.vue"
+import store from "@/store"
 
 Vue.use(VueRouter)
 
@@ -39,6 +40,7 @@ router.beforeEach((to, from, next) => {
   {
     if(localStorage.getItem('token')) 
     {
+      if(!store.state.token)store.commit('addtoken', localStorage.getItem('token'))
       next()
     }
     else 

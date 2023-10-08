@@ -48,12 +48,13 @@
             <!-- 内容 -->
             <!-- 贺卡名字 -->
             <div class="mybox">
-              <span class="myborder">输入图片名字</span><br>
-              <input type="text" name="imageName">
+              <span class="myborder">输入图片名称</span><br>
+              <input type="text" name="imageName" @blur="blurChange" @focus="focusChange"><br>
+              <div class="signs" v-if="!nameSign">&nbsp;!图片名称不能为空</div>
             </div>
             <!-- 图片分类 -->
             <div class="mybox">
-              <span class="myborder">选择图片分类:</span><br>
+              <span class="myborder" @click="typeChange">选择图片分类:</span><br>
               <span><label><input name="type" type="checkbox" value="carousel" />轮播图&nbsp;&nbsp;</label></span>
               <span><label><input name="type" type="checkbox" value="festival" />节日&nbsp;&nbsp;</label></span>
               <span><label><input name="type" type="checkbox" value="couple" />情侣&nbsp;&nbsp;</label></span>
@@ -63,11 +64,14 @@
               <span><label><input name="type" type="checkbox" value="teacher" />老师&nbsp;&nbsp;</label></span>
               <span><label><input name="type" type="checkbox" value="camaraderie" />友情&nbsp;&nbsp;</label></span>
               <span><label><input name="type" type="checkbox" value="anniversary" />周年庆&nbsp;&nbsp;</label></span>
+              <br>
+              <div class="signs" v-if="!typeSign">&nbsp;!图片分类不能为空</div>
             </div>
             <!-- 上传正面 -->
             <div class="mybox">
-              <label for="image01" class="myborder">选择贺卡正面照片:</label><br>
+              <label for="image01" class="myborder" @click="fileChange">选择贺卡正面照片:</label><br>
               <input type="file" name="image01">
+              <div class="signs" v-if="!fileSign">&nbsp;!贺卡正面不能为空</div>
             </div>
             <!-- 上传背面 -->
             <div class="mybox">
@@ -91,7 +95,11 @@
   export default {
     data() {
       return {
-        retList: []
+        retList: [],
+        type: '',
+        nameSign: true,
+        typeSign: true,
+        fileSign: true
       }
     },
     methods: {
@@ -118,36 +126,49 @@
 
       //增加贺卡
 
+      //响应拦截器
+      submitHandleResponse(responce) {
+        if (responce.data.code === 0) {
+          throw new Error(responce.data.msg)
+        }
+      },
       async submit(e) {
-        e.preventDefault()
-        // console.log(e)
-        const form = e.target
-        // console.log(form)
-        let formData = new FormData(form)
-        // console.log(formData)
-        let day = Array.from(document.getElementsByName("type"))
-        const isDay = day
-          .filter(arr => arr.checked)
-          .map(arr => arr.value)
-        formData.append('types', JSON.stringify(isDay))
-        await axios({
-          url: 'http://localhost:8080/admin/upLoadImage',
-          method: 'POST',
-          data: formData,
-          headers: {
-            "token": this.token
+        try {
+          e.preventDefault()
+          const state = this.blurChange() & this.fileChange() & this.typeChange()
+          // console.log('state:')
+          // console.log(state)
+          if (!state) {
+            // console.log(state)
+            return
           }
-        }).then(ret => {
-          console.log(ret)
+          // console.log(e)
+          const form = e.target
+          // console.log(form)
+          let formData = new FormData(form)
+          // console.log(formData)
+          let day = Array.from(document.getElementsByName("type"))
+          const isDay = day
+            .filter(arr => arr.checked)
+            .map(arr => arr.value)
+          formData.append('types', JSON.stringify(isDay))
+          const ret = await axios({
+            url: 'http://localhost:8080/admin/upLoadImage',
+            method: 'POST',
+            data: formData,
+            headers: {
+              "token": localStorage.getItem('token')
+            }
+          })
+          this.submitHandleResponse(ret)
           alert('上传成功')
-          document.querySelector('.reset').click()    //触发reset的点击事件，重置表单
-          document.querySelector('.el-menu-item.is-active').click()    //重新点击本标签，重新加载数据
-        }).catch(err => {
-          alert('增加贺卡失败了')
-          console.log(err)
+          document.querySelector('.alert').style.display = 'none'
           document.querySelector('.reset').click()
-        })
-        document.querySelector('.alert').style.display = 'none'
+          //   document.querySelector('.el-menu-item.is-active').click()    //重新点击本标签，重新加载数据
+        } catch (err) {
+          console.log(err.message)
+          alert(err.message)
+        }
       },
 
 
@@ -176,7 +197,7 @@
             }),
             headers: {
               'Content-Type': 'application/json', // 指定请求头为JSON类型
-              "token": this.token,
+              "token": localStorage.getItem('token')
             }
           })
           //把ret给响应拦截，然后直接赋值给retList
@@ -211,58 +232,113 @@
         //   alert('获取信息出错')
         // })
       },
+      //刚进入初始化数据
+      //有问题 刷新后回失去localstorage的token
+      async created() {
+        try {
+          //先从localstorage获取token
+          console.log('从这开始')
+          console.log(this.token)
+          console.log('从这结束')
+          const ret = await axios({
+            url: 'http://localhost:8080/admin/getMessage',
+            method: 'POST',
+            data: JSON.stringify({
+              type: 'all'
+            }),
+            headers: {
+              'Content-Type': 'application/json', // 指定请求头为JSON类型
+              'token': localStorage.getItem('token')
+            }
+          })
+          this.retList = this.typeHandleResponce(ret)
+        } catch (err) {
+          console.log(err.message)
+
+          //如果token失效的话，特殊处理
+          if (err.message === 'NOT_LOGIN') {
+            //弹窗
+            alert('登录信息过期，请重新登录')
+            //清除token信息
+            // this.$store.commit('addtoken', '')
+            localStorage.setItem('token', '')
+            //跳转回login
+            this.$router.push({ name: 'login' })
+          }
+          else {
+            alert(err.message)
+          }
+        }
+      },
+
+
+      //表单验证模块
+      blurChange() {
+        const value = document.querySelector('[name=imageName]').value
+        if (!value) {
+          this.nameSign = false
+          return false
+        }
+        else this.nameSign = true
+        return true
+      },
+      focusChange() {
+        this.nameSign = true
+      },
+      typeChange() {
+        let day = Array.from(document.getElementsByName("type"))
+        const isDay = day.filter(arr => arr.checked).map(arr => arr.value)
+        console.log(isDay)
+        if (isDay.length === 0) {
+          setTimeout(() => {
+            this.typeSign = true
+          }, 1000);
+          this.typeSign = false
+          // console.log('false')
+          return false
+        }
+        return true
+      },
+      fileChange() {
+        const value = document.querySelector('[name = image01]').value
+        if (!value) {
+          setTimeout(() => {
+            this.fileSign = true
+          }, 1000);
+          this.fileSign = false
+          return false
+        }
+        return true
+      },
+      //表单验证模块
+
+
+      //姓名验证模块 
+      //到这里
+
+
+      // addtoken(token) {
+      //   this.$store.commit('addtoken', token)
+      // }
+      refreshData() {
+        console.log()
+      }
     },
+
+
     components: {
       Mybody
     },
+
     computed: {
-      token() {
-        return this.$store.state.token
-      }
+      // token() {
+      //   return this.$store.state.token
+      // }
+
     },
 
 
-    //刚进入初始化数据
-    //有问题 刷新后回失去localstorage的token
-    async mounted() {
-      try {
-        //先从localstorage获取token
-        await setTimeout(() => {
-        }, 2000);
-        this.token = await localStorage.getItem('token')
-        console.log('从这开始')
-        console.log(this.token)
-        console.log('从这结束')
-        const ret = await axios({
-          url: 'http://localhost:8080/admin/getMessage',
-          method: 'POST',
-          data: JSON.stringify({
-            type: 'all'
-          }),
-          headers: {
-            'Content-Type': 'application/json', // 指定请求头为JSON类型
-            'token': this.token
-          }
-        })
-        this.retList = this.typeHandleResponce(ret)
-      } catch (err) {
-        console.log(err.message)
 
-        //如果token失效的话，特殊处理
-        if (err.message === 'NOT_LOGIN') {
-          //弹窗
-          alert('登录信息过期，请重新登录')
-          //清除token信息
-          this.$store.commit('addtoken', '')
-          localStorage.setItem('token', '')
-          //跳转回login
-          this.$router.push({ name: 'login' })
-        }
-        else {
-          alert(err.message)
-        }
-      }
-    }
   }
 </script>
 <style scoped>
@@ -361,5 +437,11 @@
   }
   .reset {
     display: none;
+  }
+
+  /* 表单验证字体 */
+  .signs {
+    color: red;
+    font-size: 10px;
   }
 </style>
