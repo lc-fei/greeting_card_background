@@ -103,20 +103,13 @@
       }
     },
     methods: {
-      handleOpen(key, keyPath) {
-        console.log(key, keyPath);
-      },
-      handleClose(key, keyPath) {
-        console.log(key, keyPath);
-      },
+      //增加贺卡弹窗的显示与隐藏
       show() {
         document.querySelector('.alert').style.display = 'flex'
       },
       hide() {
         document.querySelector('.alert').style.display = 'none'
       },
-
-
       backHide(e) {     //这里注意，传参要不是 backHide($event),要不就不写括号，直接是backHide
         const alert = document.querySelector('.alert')
         if (e.target == alert) {
@@ -124,14 +117,14 @@
         }
       },
 
-      //增加贺卡
-
+      //增加贺卡开始
       //响应拦截器
       submitHandleResponse(responce) {
         if (responce.data.code === 0) {
           throw new Error(responce.data.msg)
         }
       },
+      //增加贺卡
       async submit(e) {
         try {
           e.preventDefault()
@@ -170,10 +163,49 @@
           alert(err.message)
         }
       },
+      //表单验证模块
+      blurChange() {
+        const value = document.querySelector('[name=imageName]').value
+        if (!value) {
+          this.nameSign = false
+          return false
+        }
+        else this.nameSign = true
+        return true
+      },
+      focusChange() {
+        this.nameSign = true
+      },
+      typeChange() {
+        let day = Array.from(document.getElementsByName("type"))
+        const isDay = day.filter(arr => arr.checked).map(arr => arr.value)
+        console.log(isDay)
+        if (isDay.length === 0) {
+          setTimeout(() => {
+            this.typeSign = true
+          }, 1000);
+          this.typeSign = false
+          // console.log('false')
+          return false
+        }
+        return true
+      },
+      fileChange() {
+        const value = document.querySelector('[name = image01]').value
+        if (!value) {
+          setTimeout(() => {
+            this.fileSign = true
+          }, 1000);
+          this.fileSign = false
+          return false
+        }
+        return true
+      },
+      //表单验证模块
+      //增加贺卡结束
 
 
-
-      //发类型，接受贺卡数组
+      //查询模块
       //响应拦截
       typeHandleResponce(responce) {
         if (responce.data.code === 0) {
@@ -184,11 +216,6 @@
       async bigNav(e) {
         try {
           this.type = e.target.dataset.mtype
-          console.log(JSON.stringify(
-            {
-              type: this.type
-            }
-          ))
           const ret = await axios({
             url: 'http://localhost:8080/admin/getMessage',
             method: 'POST',
@@ -219,7 +246,6 @@
           else {
             alert(err.message)
           }
-
         }
 
 
@@ -272,56 +298,40 @@
       },
 
 
-      //表单验证模块
-      blurChange() {
-        const value = document.querySelector('[name=imageName]').value
-        if (!value) {
-          this.nameSign = false
-          return false
+      //body删除后返回新的响应数据
+      async refreshData() {
+        try {
+          const ret = await axios({
+            url: 'http://localhost:8080/admin/getMessage',
+            method: 'POST',
+            data: JSON.stringify({
+              type: this.type
+            }),
+            headers: {
+              'Content-Type': 'application/json', // 指定请求头为JSON类型
+              "token": localStorage.getItem('token')
+            }
+          })
+          //把ret给响应拦截，然后直接赋值给retList
+          //ret也确实是对象数组
+          this.retList = this.typeHandleResponce(ret)
+        } catch (err) {
+          console.log(err.message)
+
+          //如果token失效的话，特殊处理
+          if (err.message === 'NOT_LOGIN') {
+            //弹窗
+            alert('登录信息过期，请重新登录')
+            //清除token信息
+            this.$store.commit('addtoken', '')
+            localStorage.setItem('token', '')
+            //跳转回login
+            this.$router.push({ name: 'login' })
+          }
+          else {
+            alert(err.message)
+          }
         }
-        else this.nameSign = true
-        return true
-      },
-      focusChange() {
-        this.nameSign = true
-      },
-      typeChange() {
-        let day = Array.from(document.getElementsByName("type"))
-        const isDay = day.filter(arr => arr.checked).map(arr => arr.value)
-        console.log(isDay)
-        if (isDay.length === 0) {
-          setTimeout(() => {
-            this.typeSign = true
-          }, 1000);
-          this.typeSign = false
-          // console.log('false')
-          return false
-        }
-        return true
-      },
-      fileChange() {
-        const value = document.querySelector('[name = image01]').value
-        if (!value) {
-          setTimeout(() => {
-            this.fileSign = true
-          }, 1000);
-          this.fileSign = false
-          return false
-        }
-        return true
-      },
-      //表单验证模块
-
-
-      //姓名验证模块 
-      //到这里
-
-
-      // addtoken(token) {
-      //   this.$store.commit('addtoken', token)
-      // }
-      refreshData() {
-        console.log()
       }
     },
 
