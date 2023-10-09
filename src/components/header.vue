@@ -5,7 +5,9 @@
     </div>
 
     <div class=" user">
-      <img src="../assets/user.jpg" alt="" class="my-img">
+      <router-link to="/login">
+        <img src="../assets/user.jpg" alt="" class="my-img">
+      </router-link>
     </div>
 
     <div class=" search">

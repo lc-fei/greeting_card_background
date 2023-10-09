@@ -2,12 +2,6 @@
   <el-row class="tac">
     <el-col :span="6">
       <el-menu default-active="1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
-        <!-- <el-menu-item index="1">
-          <template slot="title">
-            <i class="el-icon-coin"></i>
-            <span>全部</span>
-          </template>
-        </el-menu-item> -->
         <div @click="bigNav">
           <el-menu-item index="1" data-mtype="all">
             <i class="el-icon-coin"></i>
@@ -258,44 +252,6 @@
         //   alert('获取信息出错')
         // })
       },
-      //刚进入初始化数据
-      //有问题 刷新后回失去localstorage的token
-      async created() {
-        try {
-          //先从localstorage获取token
-          console.log('从这开始')
-          console.log(this.token)
-          console.log('从这结束')
-          const ret = await axios({
-            url: 'http://localhost:8080/admin/getMessage',
-            method: 'POST',
-            data: JSON.stringify({
-              type: 'all'
-            }),
-            headers: {
-              'Content-Type': 'application/json', // 指定请求头为JSON类型
-              'token': localStorage.getItem('token')
-            }
-          })
-          this.retList = this.typeHandleResponce(ret)
-        } catch (err) {
-          console.log(err.message)
-
-          //如果token失效的话，特殊处理
-          if (err.message === 'NOT_LOGIN') {
-            //弹窗
-            alert('登录信息过期，请重新登录')
-            //清除token信息
-            // this.$store.commit('addtoken', '')
-            localStorage.setItem('token', '')
-            //跳转回login
-            this.$router.push({ name: 'login' })
-          }
-          else {
-            alert(err.message)
-          }
-        }
-      },
 
 
       //body删除后返回新的响应数据
@@ -315,6 +271,7 @@
           //把ret给响应拦截，然后直接赋值给retList
           //ret也确实是对象数组
           this.retList = this.typeHandleResponce(ret)
+          console.log('删除成功')
         } catch (err) {
           console.log(err.message)
 
@@ -335,6 +292,43 @@
       }
     },
 
+    //刚进入初始化数据
+    //有问题 刷新后回失去localstorage的token
+    async created() {
+      try {
+        //先从localstorage获取token
+        const ret = await axios({
+          url: 'http://localhost:8080/admin/getMessage',
+          method: 'POST',
+          data: JSON.stringify({
+            type: 'all'
+          }),
+          headers: {
+            'Content-Type': 'application/json', // 指定请求头为JSON类型
+            'token': localStorage.getItem('token')
+          }
+        })
+        this.retList = this.typeHandleResponce(ret)
+        console.log('页面初始化请求数据完成')
+        console.log(this.retList)
+      } catch (err) {
+        console.log(err.message)
+
+        //如果token失效的话，特殊处理
+        if (err.message === 'NOT_LOGIN') {
+          //弹窗
+          alert('登录信息过期，请重新登录')
+          //清除token信息
+          // this.$store.commit('addtoken', '')
+          localStorage.setItem('token', '')
+          //跳转回login
+          this.$router.push({ name: 'login' })
+        }
+        else {
+          alert(err.message)
+        }
+      }
+    },
 
     components: {
       Mybody

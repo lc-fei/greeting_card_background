@@ -2,7 +2,7 @@
   <el-table :data="dataList" height="600" border style="width: 70%">
     <el-table-column label="序号" type="index" width="100">
     </el-table-column>
-    <el-table-column prop="imageName" label="名称" width="240">
+    <el-table-column prop="imageName" label="名称" width="300">
     </el-table-column>
     <!-- <el-table-column prop="address" label="地址">
     </el-table-column> -->
