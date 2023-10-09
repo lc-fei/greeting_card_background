@@ -5,6 +5,7 @@
     <keep-alive>
       <router-view></router-view>
     </keep-alive>
+    <a href="https://beian.miit.gov.cn/" target="_blank" class="nbhh">冀ICP备2023034832号-1</a>
   </div>
 </template>
 
@@ -18,4 +19,11 @@
 </script>
 
 <style lang="less" scoped>
+  .nbhh {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 5px;
+    margin-bottom: 30px;
+  }
 </style>
