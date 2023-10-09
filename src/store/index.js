@@ -8,12 +8,28 @@ export default new Vuex.Store({
     sign: false,
     token: '',
     dataList: [],
+    imageName: '',
+    image01Url: '',
+    image02Url: ''
   },
   getters: {
   },
   mutations: {
     addtoken(state, outtoken){
       state.token = outtoken
+    },
+    setImage01Url(state, url)
+    {
+      state.image01Url = url
+    }
+    ,
+    setImage02Url(state, url)
+    {
+      state.image02Url = url
+    },
+    setImageName(state, name)
+    {
+      state.imageName = name
     }
   },
   actions: {

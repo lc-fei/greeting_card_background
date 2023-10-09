@@ -10,7 +10,7 @@
       <template slot-scope="scope">
         <!-- @click="handleEdit(scope.$index, scope.row)" -->
         <!-- @click="handleDelete(scope.$index, scope.row)" -->
-        <!-- <el-button size="mini" @click="show1()">查看</el-button> -->
+        <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">查看</el-button>
         <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
       </template>
     </el-table-column>
@@ -44,12 +44,12 @@
       // },
 
       //删除数据方法
-      handleDelete(index, row) {
+      async handleDelete(index, row) {
         console.log(row)
         const imageId = row.imageId
         console.log(imageId)
         console.log(this.token)
-        axios({
+        await axios({
           url: 'http://localhost:8080/admin/delMessage',
           method: 'POST',
           data: {
@@ -66,7 +66,16 @@
           console.log(err)
           alert('删除失败')
         })
-      }
+      },
+      handleEdit(index, row) {
+        console.log(row)
+        const image01Url = row.image01Url
+        const image02Url = row.image02Url
+        this.$store.commit('setImageName', row.imageName)
+        this.$store.commit('setImage01Url', image01Url)
+        this.$store.commit('setImage02Url', image02Url)
+        this.$router.push({ name: 'look' })
+      },
 
     },
     computed: {

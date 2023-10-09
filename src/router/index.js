@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter  from "vue-router";
 import data from "@/views/data/index.vue"
 import login from "@/views/login/index.vue"
+import look from "@/views/look/index.vue"
 import store from "@/store"
 
 Vue.use(VueRouter)
@@ -29,6 +30,14 @@ const router = new VueRouter({
         title: '登录'
       }
     },
+    {
+      path: '/look',
+      name: 'look',
+      component: look,
+      meta: {
+        title: '查看'
+      }
+    }
   ]
 })
 router.beforeEach((to, from, next) => {
