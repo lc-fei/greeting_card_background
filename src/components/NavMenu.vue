@@ -140,7 +140,7 @@
             .map(arr => arr.value)
           formData.append('types', JSON.stringify(isDay))
           const ret = await axios({
-            url: 'http://localhost:8080/admin/upLoadImage',
+            url: '/admin/upLoadImage',
             method: 'POST',
             data: formData,
             headers: {
@@ -211,7 +211,7 @@
         try {
           this.type = e.target.dataset.mtype
           const ret = await axios({
-            url: 'http://localhost:8080/admin/getMessage',
+            url: '/admin/getMessage',
             method: 'POST',
             data: JSON.stringify({
               type: this.type
@@ -258,7 +258,7 @@
       async refreshData() {
         try {
           const ret = await axios({
-            url: 'http://localhost:8080/admin/getMessage',
+            url: '/admin/getMessage',
             method: 'POST',
             data: JSON.stringify({
               type: this.type
@@ -298,7 +298,7 @@
       try {
         //先从localstorage获取token
         const ret = await axios({
-          url: 'http://localhost:8080/admin/getMessage',
+          url: '/admin/getMessage',
           method: 'POST',
           data: JSON.stringify({
             type: 'all'

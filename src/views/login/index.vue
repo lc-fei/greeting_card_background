@@ -59,7 +59,7 @@
         // console.log(this.password)
         try {
           const ret = await this.sendRequest({       //这里直接await解析promise对象
-            url: 'http://localhost:8080/admin/login',
+            url: '/admin/login',
             method: 'POST',
             data: JSON.stringify({
               userName: this.userName,

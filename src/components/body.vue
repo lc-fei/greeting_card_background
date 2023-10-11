@@ -18,6 +18,9 @@
 </template>
 
 <script>
+
+
+
   import axios from 'axios'
   export default {
     props: ['dataList'],
@@ -50,7 +53,7 @@
         console.log(imageId)
         console.log(this.token)
         await axios({
-          url: 'http://localhost:8080/admin/delMessage',
+          url: '/admin/delMessage',
           method: 'POST',
           data: {
             imageId
