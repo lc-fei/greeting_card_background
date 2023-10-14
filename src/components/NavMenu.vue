@@ -2,22 +2,10 @@
   <el-row class="tac">
     <el-col :span="6">
       <el-menu default-active="1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
-        <div @click="bigNav">
-          <el-menu-item index="1" data-mtype="all">
-            <i class="el-icon-coin"></i>
-            <span slot="title">全部</span>
-          </el-menu-item>
-          <el-menu-item index="2" data-mtype="festival">
-            <i class="el-icon-burger"></i>
-            <span slot="title">节日</span>
-          </el-menu-item>
-          <el-menu-item index="3" data-mtype="birthday">
-            <i class="el-icon-lollipop"></i>
-            <span slot="title">生日</span>
-          </el-menu-item>
-          <el-menu-item index="4" data-mtype="anniversary">
-            <i class="el-icon-dessert"></i>
-            <span slot="title">周年庆</span>
+        <div @click="bigNav" v-for="(data, index) in navList" :key="data.name">
+          <el-menu-item :index="index + 1" :data-mtype="data.data_mtype" >
+            <i :class="data.icon"></i>
+            <span slot="title">{{ data.name }}</span>
           </el-menu-item>
         </div>
         <el-menu-item index="0" class="btn-alert" @click="show()">
@@ -93,7 +81,59 @@
         type: '',
         nameSign: true,
         typeSign: true,
-        fileSign: true
+        fileSign: true,
+        navList: [
+          {
+            data_mtype: 'all',
+            icon: 'el-icon-coin',
+            name: '全部',
+          },
+          {
+            data_mtype: 'festival',
+            icon: 'el-icon-burger',
+            name: '节日',
+          },
+          {
+            data_mtype: 'birthday',
+            icon: 'el-icon-lollipop',
+            name: '生日',
+          },
+          {
+            data_mtype: 'camaraderie',
+            icon: 'el-icon-burger',
+            name: '友情',
+          },
+          {
+            data_mtype: 'anniversary',
+            icon: 'el-icon-burger',
+            name: '周年庆',
+          },
+          {
+            data_mtype: 'newYear',
+            icon: 'el-icon-burger',
+            name: '新年',
+          },
+          {
+            data_mtype: 'parents',
+            icon: 'el-icon-burger',
+            name: '亲情',
+          },
+          {
+            data_mtype: 'couple',
+            icon: 'el-icon-burger',
+            name: '情侣',
+          },
+          {
+            data_mtype: 'teacher',
+            icon: 'el-icon-burger',
+            name: '老师',
+          },
+          {
+            data_mtype: 'carousel',
+            icon: 'el-icon-burger',
+            name: '轮播图',
+          }
+        ]
       }
     },
     methods: {
@@ -140,7 +180,7 @@
             .map(arr => arr.value)
           formData.append('types', JSON.stringify(isDay))
           const ret = await axios({
-            url: '/admin/upLoadImage',
+            url: '/admin/addImage',
             method: 'POST',
             data: formData,
             headers: {
@@ -205,16 +245,18 @@
         if (responce.data.code === 0) {
           throw new Error(responce.data.msg || '获取信息失败')
         }
-        return responce.data.data
+        return responce.data.data.dataList
       },
       async bigNav(e) {
         try {
           this.type = e.target.dataset.mtype
           const ret = await axios({
-            url: '/admin/getMessage',
+            url: '/admin/getImage',
             method: 'POST',
             data: JSON.stringify({
-              type: this.type
+              type: this.type,
+              pageSize: 1010,
+              pageNumber: 0,
             }),
             headers: {
               'Content-Type': 'application/json', // 指定请求头为JSON类型
@@ -298,10 +340,12 @@
       try {
         //先从localstorage获取token
         const ret = await axios({
-          url: '/admin/getMessage',
+          url: '/admin/getImage',
           method: 'POST',
           data: JSON.stringify({
-            type: 'all'
+            type: '',
+            pageSize: 1010,
+            pageNumber: 0,
           }),
           headers: {
             'Content-Type': 'application/json', // 指定请求头为JSON类型

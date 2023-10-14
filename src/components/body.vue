@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="dataList" height="600" border style="width: 70%">
+  <el-table :data="dataList" height="620" border style="width: 70%">
     <el-table-column label="序号" type="index" width="100">
     </el-table-column>
     <el-table-column prop="imageName" label="名称" width="300">
@@ -46,14 +46,19 @@
 
       // },
 
+      delCatchResponce(responce) {
+        if(responce.data.code === 0)
+        throw new Error(responce.data.msg)
+      },
       //删除数据方法
       async handleDelete(index, row) {
+        try{
         console.log(row)
-        const imageId = row.imageId
+        const imageId = row.id
         console.log(imageId)
         console.log(this.token)
-        await axios({
-          url: '/admin/delMessage',
+        const responce = await axios({
+          url: '/admin/delImage',
           method: 'POST',
           data: {
             imageId
@@ -61,19 +66,19 @@
           headers: {
             "token": this.token,
           }
-        }).then(ret => {
-          console.log(ret)
-          alert('删除成功')
-          this.$emit('itemDeleted')
-        }).catch(err => {
-          console.log(err)
-          alert('删除失败')
         })
+        this.delCatchResponce(responce)
+        console.log('成功删除了一项数据')
+        alert('删除成功')
+        } catch(err) {
+          console.log(err.message)
+          alert(err.message)
+        }
       },
       handleEdit(index, row) {
         console.log(row)
-        const image01Url = row.image01Url
-        const image02Url = row.image02Url
+        const image01Url = row.imageFrontUrl
+        const image02Url = row.imageContraryUrl
         this.$store.commit('setImageName', row.imageName)
         this.$store.commit('setImage01Url', image01Url)
         this.$store.commit('setImage02Url', image02Url)

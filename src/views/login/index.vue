@@ -5,14 +5,14 @@
       <div class="login">
         <h1 class="font">LogIn</h1>
         <div class="username mydiv">
-          <span class="sp">用户名：</span>
-          <input type="text" v-model="userName" class="inp" placeholder=" 请输入用户名" @keydown.enter="enterChange">
+          <span class="sp" style="font-family: '宋体'">用户名：</span>
+          <input type="text" style="font-family: '宋体'" v-model="userName" class="inp" placeholder=" 请输入用户名" @keydown.enter="enterChange">
         </div>
         <div class="password mydiv">
-          <span class="sp">密&nbsp;&nbsp;&nbsp;码：</span>
-          <input type="password" v-model="password" class="inp change" placeholder=" 请输入密码" @keydown.enter="enterLogin">
+          <span class="sp" style="font-family: '宋体'">密&nbsp;码：</span>
+          <input type="password" style="font-family: '宋体'" v-model="password" class="inp change" placeholder=" 请输入密码" @keydown.enter="enterLogin">
         </div>
-        <button class="submit" @mousedown="keycolor=true" @mouseup="keycolor=false" :class="{'keycolor': keycolor}" @click="submit">登录</button>
+        <button class="submit" style="font-family: '宋体'" @mousedown="keycolor=true" @mouseup="keycolor=false" :class="{'keycolor': keycolor}" @click="submit">登录</button>
       </div>
     </div>
   </div>

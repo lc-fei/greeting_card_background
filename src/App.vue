@@ -24,6 +24,6 @@
     width: 100%;
     text-align: center;
     font-size: 5px;
-    margin-bottom: 30px;
+    margin-top: 50px;
   }
 </style>
