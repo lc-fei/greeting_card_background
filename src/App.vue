@@ -23,7 +23,7 @@
     display: block;
     width: 100%;
     text-align: center;
-    font-size: 5px;
+    font-size: 10px;
     margin-top: 50px;
   }
 </style>

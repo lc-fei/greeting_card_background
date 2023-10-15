@@ -69,6 +69,7 @@
         })
         this.delCatchResponce(responce)
         console.log('成功删除了一项数据')
+        this.$emit('itemDeleted')
         alert('删除成功')
         } catch(err) {
           console.log(err.message)

@@ -104,7 +104,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    /* background: url(@/assets/login-bgc.png); */
   }
 
   .mys {

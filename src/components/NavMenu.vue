@@ -300,10 +300,12 @@
       async refreshData() {
         try {
           const ret = await axios({
-            url: '/admin/getMessage',
+            url: '/admin/getImage',
             method: 'POST',
             data: JSON.stringify({
-              type: this.type
+              type: this.type,
+              pageSize: 1010,
+              pageNumber: 0,
             }),
             headers: {
               'Content-Type': 'application/json', // 指定请求头为JSON类型
