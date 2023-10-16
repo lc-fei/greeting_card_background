@@ -7,8 +7,8 @@
     </div><br>
     <div class="back">反面：</div>
     <div class="bg bg2">
-    <img :src="image02Url" v-if="image02Url.length != 0">
-    <i v-else>该贺卡不存在反面</i>
+    <i v-if="image02Url === null">该贺卡不存在反面</i>
+    <img :src="image02Url" v-else>
     </div>
   </div>
 </template>

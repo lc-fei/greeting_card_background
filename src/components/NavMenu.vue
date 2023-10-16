@@ -179,6 +179,11 @@
             .filter(arr => arr.checked)
             .map(arr => arr.value)
           formData.append('types', JSON.stringify(isDay))
+          //如果背面为空，那就删除这个键
+          if(!document.querySelector('[name=image02]').value) formData.delete("image02") 
+          // for (var value of formData.values()) {    //要取出formdata中的值，要进行循环操作
+          //   console.log(value);
+          // }
           const ret = await axios({
             url: '/admin/addImage',
             method: 'POST',

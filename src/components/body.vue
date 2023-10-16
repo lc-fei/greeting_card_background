@@ -76,6 +76,8 @@
           alert(err.message)
         }
       },
+
+      //点击查看事件
       handleEdit(index, row) {
         console.log(row)
         const image01Url = row.imageFrontUrl

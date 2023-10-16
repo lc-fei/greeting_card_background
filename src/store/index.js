@@ -10,7 +10,7 @@ export default new Vuex.Store({
     dataList: [],
     imageName: '',
     image01Url: '',
-    image02Url: ''
+    image02Url: '' || null
   },
   getters: {
   },
