@@ -1,7 +1,7 @@
 <template>
   <div class="body">
     <div class="trademark">
-      <img src="../assets/logo.jpg" alt="" class="my-img">
+      <img src="../assets/logo.png" alt="" class="my-img">
     </div>
 
     <div class=" user">
@@ -35,12 +35,13 @@
   .trademark {
     position: absolute;
     left: 80px;
-    top: auto;
+    top: 0;
     height: 45px;
-    width: 100px;
-    /* border: 1px solid red; */
+    width: 45px;
+    border: 1px solid rgba(0, 0, 0, .3);
     /* background: url('../assets/logo.jpg') no-repeat center fixed; */
     cursor: pointer;
+    border-radius: 45px;
   }
   .user {
     position: absolute;
