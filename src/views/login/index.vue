@@ -6,7 +6,7 @@
         <h1 class="font">LogIn</h1>
         <div class="username mydiv">
           <span class="sp" style="font-family: '宋体'">用户名：</span>
-          <input type="text" style="font-family: '宋体'" v-model="userName" class="inp" placeholder=" 请输入用户名" @keydown.enter="enterChange">
+          <input type="text" style="font-family: '宋体'" v-model="userName" class="inp" placeholder=" 请输入用户名" @keydown.enter="enterChange" v-focus>
         </div>
         <div class="password mydiv">
           <span class="sp" style="font-family: '宋体'">密&nbsp;码：</span>
@@ -53,7 +53,6 @@
         return token          //返回token
       },
 
-
       async submit() {
         // console.log(this.$store.state.sign)
         // console.log(this.password)
@@ -90,6 +89,14 @@
         document.querySelector('.change').focus()
       }
     },
+      directives: {
+        focus: {
+          // 指令的定义
+          inserted:  (el) => {
+            el.focus() // 页面加载完成之后自动让输入框获取到焦点的小功能
+          }
+        }
+    }
   }
 </script>
 
