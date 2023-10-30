@@ -64,6 +64,7 @@
           <div class="sub-father">
             <button type="submit" class="submit">上传</button>
             <input type="reset" class="reset">
+            <canvas id="canvas" style="display: none;"></canvas>
           </div>
         </form>
       </div>
@@ -74,6 +75,7 @@
 <script>
   import axios from 'axios';
   import Mybody from './body.vue';
+  // import URL from 'url';
   export default {
     data() {
       return {
@@ -180,10 +182,25 @@
             .map(arr => arr.value)
           formData.append('types', JSON.stringify(isDay))
           //如果背面为空，那就删除这个键
-          if(!document.querySelector('[name=image02]').value) formData.delete("image02") 
-          // for (var value of formData.values()) {    //要取出formdata中的值，要进行循环操作
-          //   console.log(value);
-          // }
+          formData.forEach((item => {
+            console.log(item)
+          }))
+          if(!document.querySelector('[name=image02]').value) formData.delete("image02")
+          
+          else {
+            await this.unfoldFile(formData.get('image02')).then(result => {
+              formData.set('image02', result)
+            }).catch(err => {
+              console.log(err)
+            })
+          }
+            await this.unfoldFile(formData.get('image01')).then(result => {
+            console.log(result)
+            formData.set('image01', result)
+          }).catch(err => {
+            console.log('err', err)
+          })
+
           const ret = await axios({
             url: '/admin/addImage',
             method: 'POST',
@@ -199,7 +216,19 @@
           //   document.querySelector('.el-menu-item.is-active').click()    //重新点击本标签，重新加载数据
         } catch (err) {
           console.log(err.message)
-          alert(err.message)
+          //如果token失效的话，特殊处理
+          if (err.message === 'NOT_LOGIN') {
+            //弹窗
+            alert('登录信息过期，请重新登录')
+            //清除token信息
+            this.$store.commit('addtoken', '')
+            localStorage.setItem('token', '')
+            //跳转回login
+            this.$router.push({ name: 'login' })
+          }
+          else {
+            alert(err.message)
+          }
         }
       },
       //表单验证模块
@@ -338,6 +367,56 @@
             alert(err.message)
           }
         }
+      },
+      
+      //文件压缩
+      async unfoldFile(file)
+      {
+        // console.log('原似乎',file)     file 是可以传过来的
+        //创建图片实例
+        const img = new Image()
+        img.src = window.URL.createObjectURL(file)
+        // console.log('img', img)
+        // console.log('src', img.src)
+        return new Promise((resolve, reject) => {
+            img.onload = () => {
+            const canvas = document.querySelector('#canvas')
+            const ctx = canvas.getContext('2d')
+            const maxWidth = 800
+            const maxHight = 800
+            let newWidth, newHight
+            console.log('old', img.height, img.width)
+            if(img.height > img.width)
+            {
+              newHight = Math.min(maxHight, img.height)
+              newWidth = (img.width / img.height) * newHight
+            }
+            else
+            {
+              newWidth = Math.min(maxWidth, img.width)
+              newHight = (img.height / img.width) * newWidth
+            }
+            console.log('new', newHight, newWidth)
+            canvas.width = newWidth
+            canvas.height = newHight            
+            //释放url资源，避免内存泄漏
+            URL.revokeObjectURL(img.src)
+            ctx.drawImage(img, 0, 0, newWidth, newHight)
+            console.log('canvas', canvas)
+            console.log('canvasHH', canvas.height)
+            canvas.toBlob(blob => {
+              resolve(new File([blob], 'image.png'))
+
+              // console.log('blob', blob)
+              // const unfolded = new File([blob], 'image.png')
+              // console.log('file', unfolded)
+              // callback(unfolded)
+            }, 'image/png', 1)
+            img.onerror = error => {
+              reject(error);
+            };
+          }
+        })
       }
     },
 
@@ -391,9 +470,6 @@
       // }
 
     },
-
-
-
   }
 </script>
 <style scoped>

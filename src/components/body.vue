@@ -73,7 +73,19 @@
         alert('删除成功')
         } catch(err) {
           console.log(err.message)
-          alert(err.message)
+          //如果token失效的话，特殊处理
+          if (err.message === 'NOT_LOGIN') {
+            //弹窗
+            alert('登录信息过期，请重新登录')
+            //清除token信息
+            this.$store.commit('addtoken', '')
+            localStorage.setItem('token', '')
+            //跳转回login
+            this.$router.push({ name: 'login' })
+          }
+          else {
+            alert(err.message)
+          }
         }
       },
 
