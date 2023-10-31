@@ -97,7 +97,7 @@
           },
           {
             data_mtype: 'birthday',
-            icon: 'el-icon-lollipop',
+            icon: 'el-icon-burger',
             name: '生日',
           },
           {
